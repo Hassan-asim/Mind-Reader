@@ -1,31 +1,47 @@
 # Dependencies
 node_modules/
-/.pnp
+.pnp
 .pnp.js
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+.venv
+*.egg-info/
+dist/
+*.egg
+.pytest_cache/
+.coverage
+htmlcov/
+*,cover
+
+# Next.js
+.next/
+/out/
+build/
 
 # Testing
 /coverage
 
-# Next.js
-/.next/
-/out/
-
 # Production
-/build
+*.pem
 
 # Misc
 .DS_Store
-*.pem
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
-#
-# Mac
-.AppleDouble
-.LSOverride
-
-# Thumbnails
+# OS
+Thumbs.db
 ._*
-
-# Files that might appear in the root of a volume
 .DocumentRevisions-V100
 .fseventsd
 .Spotlight-V100
@@ -33,15 +49,22 @@ node_modules/
 .Trashes
 .VolumeIcon.icns
 .com.apple.timemachine.donotpresent
-
-# Directories potentially created on remote AFP share
 .AppleDB
 .AppleDesktop
 .Network Trash Folder
 Temporary Items
 .apdisk
 
-# End of https://www.toptal.com/developers/gitignore/api/nextjs
-
-# VSCode
+# IDE
 .vscode/
+.idea/
+
+# Environment
+.env
+.env.local
+.env.production
+
+# Generated files
+decision_tree.json
+next-env.d.ts
+.qwen/
