@@ -4,30 +4,50 @@ A **20 Questions AI Mind Reader Game** with 8-bit pixel art style. The AI uses a
 
 ![Mind Reader Game](1.png)
 
-## 🚀 Quick Start
+## 🚀 How to Run
 
-### Windows (One-Click)
-1. Double-click `setup.bat` (first time only)
-2. Double-click `run.bat`
-3. Open http://localhost:3000
+### Step 1: Start Backend (Terminal 1)
 
-### Manual Setup
-
-**Backend:**
 ```bash
 cd backend
+
+# Create virtual environment (first time only)
 python -m venv venv
-venv\Scripts\activate  # Windows
+
+# Activate virtual environment
+# Windows:
+venv\Scripts\activate
+# Mac/Linux:
+source venv/bin/activate
+
+# Install dependencies (first time only)
 pip install -r requirements.txt
+
+# Start server
 python app.py
 ```
 
-**Frontend (new terminal):**
+Backend runs on: **http://localhost:3001**
+
+### Step 2: Start Frontend (Terminal 2)
+
 ```bash
 cd frontend
+
+# Install dependencies (first time only)
 npm install
+
+# Start development server
 npm run dev
 ```
+
+Frontend runs on: **http://localhost:3000**
+
+### Step 3: Play!
+
+Open your browser to **http://localhost:3000**
+
+---
 
 ## 🎮 How to Play
 
@@ -36,6 +56,8 @@ npm run dev
 3. AI guesses your thought in ~20 questions
 4. If AI guesses wrong, teach it - it will remember!
 
+---
+
 ## ✨ Features
 
 - **🤖 AI Learning**: Decision tree grows with every game
@@ -43,10 +65,14 @@ npm run dev
 - **💾 Persistent Memory**: Learned objects are saved
 - **🌳 Dynamic Questions**: Not hardcoded - AI adapts
 
+---
+
 ## 🛠️ Tech Stack
 
 - **Backend**: Python 3.11+, Flask, Flask-CORS
 - **Frontend**: Next.js 14, TypeScript, Tailwind CSS
+
+---
 
 ## 📁 Project Structure
 
@@ -60,17 +86,43 @@ Mind-Reader/
 │   └── src/app/
 │       ├── page.tsx        # Main game UI
 │       └── globals.css     # Styles
-├── setup.bat               # Setup script
-├── run.bat                 # Run script
 └── README.md
 ```
 
-## 🎯 API Endpoints
+---
+
+## 🔌 API Endpoints
 
 - `POST /api/game/start` - Start new game
 - `POST /api/game/answer` - Submit YES/NO answer
 - `POST /api/game/learn` - Teach AI new object
 - `GET /api/objects` - List all known objects
+
+---
+
+## 🐛 Troubleshooting
+
+**Backend won't start:**
+```bash
+cd backend
+venv\Scripts\activate  # or: source venv/bin/activate
+pip install -r requirements.txt
+python app.py
+```
+
+**Frontend won't start:**
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+**Can't connect:**
+- Make sure backend is running on port 3001
+- Check browser console for errors
+- Try refreshing the page
+
+---
 
 ## 📄 License
 
