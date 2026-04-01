@@ -4,8 +4,77 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
+* {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
 body {
   font-family: 'Press Start 2P', cursive;
   background-color: #1a1a2e;
   color: #eaeaea;
+}
+
+/* Pixel border effect */
+.pixel-border {
+  box-shadow: 
+    -4px 0 0 0 #000,
+    4px 0 0 0 #000,
+    0 -4px 0 0 #000,
+    0 4px 0 0 #000;
+  margin: 4px;
+}
+
+/* Retro text shadow */
+.retro-text {
+  text-shadow: 4px 4px 0 #000;
+}
+
+/* Pixel button */
+.btn-pixel {
+  font-family: 'Press Start 2P', cursive;
+  transition: all 0.1s;
+  image-rendering: pixelated;
+}
+
+.btn-pixel:active {
+  transform: translateY(4px);
+}
+
+/* Animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.animate-float {
+  animation: float 2s ease-in-out infinite;
+}
+
+@keyframes sparkle {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.2); }
+}
+
+.animate-sparkle {
+  animation: sparkle 1s ease-in-out infinite;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 16px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1a1a2e;
+  border: 4px solid #000;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #4A90E2;
+  border: 4px solid #000;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #357ABD;
 }
