@@ -27,7 +27,7 @@ const Robot = ({ state }: { state: 'thinking' | 'happy' | 'confused' }) => (
   </svg>
 );
 
-type GameState = 'start' | 'playing' | 'guess' | 'learn' | 'result';
+type GameState = 'start' | 'playing' | 'guess' | 'result';
 
 export default function Home() {
   const [gameState, setGameState] = useState<GameState>('start');
@@ -35,11 +35,9 @@ export default function Home() {
   const [question, setQuestion] = useState('');
   const [questionCount, setQuestionCount] = useState(0);
   const [answer, setAnswer] = useState('');
+  const [confidence, setConfidence] = useState(0);
   const [loading, setLoading] = useState(false);
   const [robotState, setRobotState] = useState<'thinking' | 'happy' | 'confused'>('thinking');
-  const [userObject, setUserObject] = useState('');
-  const [distinguishingQuestion, setDistinguishingQuestion] = useState('');
-  const [isYesForNew, setIsYesForNew] = useState(true);
 
   const startGame = async () => {
     setLoading(true);
@@ -68,12 +66,14 @@ export default function Home() {
       const data = await res.json();
       if (data.type === 'guess') {
         setAnswer(data.answer);
+        setConfidence(data.confidence);
         setQuestionCount(data.question_count);
         setGameState('guess');
-        setRobotState('happy');
+        setRobotState(data.confidence > 80 ? 'happy' : 'confused');
       } else {
         setQuestion(data.question);
         setQuestionCount(data.question_count);
+        setRobotState('thinking');
       }
     } catch (error) {
       console.error('Error:', error);
@@ -82,29 +82,8 @@ export default function Home() {
   };
 
   const confirmGuess = (correct: boolean) => {
-    setGameState(correct ? 'result' : 'learn');
-    setRobotState(correct ? 'happy' : 'confused');
-  };
-
-  const teachAI = async () => {
-    setLoading(true);
-    try {
-      await fetch('http://localhost:3001/api/game/learn', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          session_id: sessionId,
-          object: userObject,
-          question: distinguishingQuestion,
-          is_yes_for_new: isYesForNew
-        })
-      });
-      setGameState('result');
-      setRobotState('happy');
-    } catch (error) {
-      console.error('Error:', error);
-    }
-    setLoading(false);
+    setGameState('result');
+    setRobotState(correct ? 'happy' : 'thinking');
   };
 
   return (
@@ -114,8 +93,11 @@ export default function Home() {
           <h1 className="text-3xl font-bold text-[#FFD700] mb-2" style={{ fontFamily: "'Press Start 2P', cursive" }}>
             MIND READER
           </h1>
-          <p className="text-xs text-[#888888]" style={{ fontFamily: "'Press Start 2P', cursive" }}>
-            Think of something... I'll guess it!
+          <p className="text-xs text-[#888888] mb-4" style={{ fontFamily: "'Press Start 2P', cursive" }}>
+            Think of ANYTHING... I'll guess it!
+          </p>
+          <p className="text-xs text-[#4A90E2]" style={{ fontFamily: "'Press Start 2P', cursive" }}>
+            100+ objects in my database
           </p>
         </div>
 
@@ -126,9 +108,16 @@ export default function Home() {
 
           {gameState === 'start' && (
             <div className="text-center">
-              <p className="text-sm text-[#E8F4F8] mb-8" style={{ fontFamily: "'Press Start 2P', cursive" }}>
-                Think of an object, animal,<br />or thing...
-              </p>
+              <div className="bg-[#0f0f23] border-4 border-[#000] p-4 mb-6">
+                <p className="text-xs text-[#888888] mb-2" style={{ fontFamily: "'Press Start 2P', cursive" }}>
+                  🎯 Think of something specific:
+                </p>
+                <ul className="text-xs text-[#E8F4F8] space-y-1" style={{ fontFamily: "'Press Start 2P', cursive" }}>
+                  <li>• An animal (dog, tiger, eagle...)</li>
+                  <li>• An object (phone, car, chair...)</li>
+                  <li>• Food, vehicles, electronics...</li>
+                </ul>
+              </div>
               <button
                 onClick={startGame}
                 disabled={loading}
@@ -175,11 +164,25 @@ export default function Home() {
             <div className="text-center">
               <div className="bg-[#0f0f23] border-4 border-[#000] p-6 mb-6">
                 <p className="text-xs text-[#888888] mb-4" style={{ fontFamily: "'Press Start 2P', cursive" }}>
-                  I THINK YOU'RE THINKING OF...
+                  🔮 MY GUESS IS...
                 </p>
-                <p className="text-xl text-[#FFD700]" style={{ fontFamily: "'Press Start 2P', cursive" }}>
+                <p className="text-xl text-[#FFD700] mb-4" style={{ fontFamily: "'Press Start 2P', cursive" }}>
                   {answer}
                 </p>
+                <div className="mt-4">
+                  <p className="text-xs text-[#888888] mb-2" style={{ fontFamily: "'Press Start 2P', cursive" }}>
+                    CONFIDENCE:
+                  </p>
+                  <div className="w-full bg-[#1a1a2e] border-2 border-[#000] h-4">
+                    <div 
+                      className={`h-full ${confidence > 80 ? 'bg-[#00AA00]' : confidence > 50 ? 'bg-[#FFAA00]' : 'bg-[#AA0000]'}`}
+                      style={{ width: `${confidence}%` }}
+                    />
+                  </div>
+                  <p className="text-xs text-[#E8F4F8] mt-2" style={{ fontFamily: "'Press Start 2P', cursive" }}>
+                    {confidence}%
+                  </p>
+                </div>
               </div>
               <p className="text-sm text-[#E8F4F8] mb-6" style={{ fontFamily: "'Press Start 2P', cursive" }}>
                 Am I correct?
@@ -190,64 +193,14 @@ export default function Home() {
                   className="bg-[#00AA00] hover:bg-[#008800] text-white px-6 py-4 text-sm border-4 border-[#000]"
                   style={{ fontFamily: "'Press Start 2P', cursive" }}
                 >
-                  CORRECT!
+                  ✓ CORRECT!
                 </button>
                 <button
                   onClick={() => confirmGuess(false)}
                   className="bg-[#AA0000] hover:bg-[#880000] text-white px-6 py-4 text-sm border-4 border-[#000]"
                   style={{ fontFamily: "'Press Start 2P', cursive" }}
                 >
-                  WRONG
-                </button>
-              </div>
-            </div>
-          )}
-
-          {gameState === 'learn' && (
-            <div className="text-center">
-              <p className="text-sm text-[#E8F4F8] mb-6" style={{ fontFamily: "'Press Start 2P', cursive" }}>
-                You win! Teach me:
-              </p>
-              <div className="space-y-4">
-                <input
-                  type="text"
-                  value={userObject}
-                  onChange={(e) => setUserObject(e.target.value)}
-                  className="w-full bg-[#0f0f23] border-4 border-[#000] px-4 py-3 text-sm text-[#E8F4F8]"
-                  style={{ fontFamily: "'Press Start 2P', cursive" }}
-                  placeholder="e.g., Tiger"
-                />
-                <input
-                  type="text"
-                  value={distinguishingQuestion}
-                  onChange={(e) => setDistinguishingQuestion(e.target.value)}
-                  className="w-full bg-[#0f0f23] border-4 border-[#000] px-4 py-3 text-sm text-[#E8F4F8]"
-                  style={{ fontFamily: "'Press Start 2P', cursive" }}
-                  placeholder="Question to distinguish it?"
-                />
-                <div className="flex justify-center gap-4">
-                  <button
-                    onClick={() => setIsYesForNew(true)}
-                    className={`px-6 py-3 text-sm border-4 border-[#000] ${isYesForNew ? 'bg-[#00AA00] text-white' : 'bg-[#444444] text-[#888888]'}`}
-                    style={{ fontFamily: "'Press Start 2P', cursive" }}
-                  >
-                    YES
-                  </button>
-                  <button
-                    onClick={() => setIsYesForNew(false)}
-                    className={`px-6 py-3 text-sm border-4 border-[#000] ${!isYesForNew ? 'bg-[#AA0000] text-white' : 'bg-[#444444] text-[#888888]'}`}
-                    style={{ fontFamily: "'Press Start 2P', cursive" }}
-                  >
-                    NO
-                  </button>
-                </div>
-                <button
-                  onClick={teachAI}
-                  disabled={loading || !userObject || !distinguishingQuestion}
-                  className="bg-[#4A90E2] hover:bg-[#357ABD] text-white px-8 py-4 text-sm border-4 border-[#000] disabled:bg-[#444444]"
-                  style={{ fontFamily: "'Press Start 2P', cursive" }}
-                >
-                  {loading ? 'LEARNING...' : 'TEACH ME!'}
+                  ✗ WRONG
                 </button>
               </div>
             </div>
@@ -255,12 +208,28 @@ export default function Home() {
 
           {gameState === 'result' && (
             <div className="text-center">
-              <p className="text-sm text-[#FFD700] mb-4" style={{ fontFamily: "'Press Start 2P', cursive" }}>
-                {robotState === 'happy' ? '★ I GUESSED IT! ★' : '★ THANK YOU FOR TEACHING ME! ★'}
-              </p>
-              <p className="text-xs text-[#888888] mb-6" style={{ fontFamily: "'Press Start 2P', cursive" }}>
-                {robotState === 'happy' ? `It only took me ${questionCount} questions!` : `I'll remember ${userObject} next time!`}
-              </p>
+              <div className="mb-6">
+                {confidence > 80 ? (
+                  <>
+                    <p className="text-sm text-[#00AA00] mb-4" style={{ fontFamily: "'Press Start 2P', cursive" }}>
+                      ★ I GUESSED IT! ★
+                    </p>
+                    <p className="text-xs text-[#888888]" style={{ fontFamily: "'Press Start 2P', cursive" }}>
+                      It only took me {questionCount} questions!
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-sm text-[#FFAA00] mb-4" style={{ fontFamily: "'Press Start 2P', cursive" }}>
+                      ★ CLOSE ONE! ★
+                    </p>
+                    <p className="text-xs text-[#888888]" style={{ fontFamily: "'Press Start 2P', cursive" }}>
+                      My confidence was only {confidence}%
+                    </p>
+                  </>
+                )}
+              </div>
+              
               <button
                 onClick={startGame}
                 className="bg-[#4A90E2] hover:bg-[#357ABD] text-white px-8 py-4 text-sm border-4 border-[#000]"
